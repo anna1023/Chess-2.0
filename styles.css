@@ -1,0 +1,47 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+#chessboard-container {
+    display: inline-block;
+}
+
+#chessboard {
+    border-collapse: collapse;
+    border: 2px solid #333;
+    box-shadow: 0px 0px 5px 0px #888;
+    width: 600px;
+    height: 600px;
+    margin: auto; 
+}
+
+.cell {
+    width: 75px;
+    height: 75px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 24px; 
+    background-color: #ccc;
+}
+
+.even {
+    background-color: #f0f0f0;
+}
+
+.piece {
+    font-size: 40px; 
+    line-height: 1; 
+}
+
+.piece.white {
+    color: white;
+}
+
+.piece.black {
+    color: black;
+}

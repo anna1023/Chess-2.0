@@ -44,48 +44,6 @@ class Game {
             if (row==0){
                 if (col==0 || col==7){
                     let squareInformation = {
-                        color : White,
-                        type : Rook,
-                        move : 0,
-                    }
-                    this.Board[row][col]=squareInformation;
-                }
-                if (col==1 || col== 6){
-                    let squareInformation = {
-                        color : White,
-                        type : Knight,
-                        move : 0,
-                    }
-                    this.Board[row][col]=squareInformation;
-                }
-                if (col==2 || col== 5){
-                    let squareInformation = {
-                        color : White,
-                        type : Bishop,
-                        move : 0,
-                    }
-                    this.Board[row][col]=squareInformation;
-                }
-                if (col==3){
-                    let squareInformation = {
-                        color : White,
-                        type : Queen,
-                        move : 0,
-                    }
-                    this.Board[row][col]=squareInformation;
-                }
-                if (col==4){
-                    let squareInformation = {
-                        color : White, 
-                        type : King, 
-                        move : 0,
-                    }
-                    this.Board[row][col]=squareInformation;
-                }
-            }
-            if (row==7){
-                if (col==0 || col==7){
-                    let squareInformation = {
                         color : Black,
                         type : Rook,
                         move : 0,
@@ -119,6 +77,48 @@ class Game {
                 if (col==4){
                     let squareInformation = {
                         color : Black, 
+                        type : King, 
+                        move : 0,
+                    }
+                    this.Board[row][col]=squareInformation;
+                }
+            }
+            if (row==7){
+                if (col==0 || col==7){
+                    let squareInformation = {
+                        color : White,
+                        type : Rook,
+                        move : 0,
+                    }
+                    this.Board[row][col]=squareInformation;
+                }
+                if (col==1 || col== 6){
+                    let squareInformation = {
+                        color : White,
+                        type : Knight,
+                        move : 0,
+                    }
+                    this.Board[row][col]=squareInformation;
+                }
+                if (col==2 || col== 5){
+                    let squareInformation = {
+                        color : White,
+                        type : Bishop,
+                        move : 0,
+                    }
+                    this.Board[row][col]=squareInformation;
+                }
+                if (col==3){
+                    let squareInformation = {
+                        color : White,
+                        type : Queen,
+                        move : 0,
+                    }
+                    this.Board[row][col]=squareInformation;
+                }
+                if (col==4){
+                    let squareInformation = {
+                        color : White, 
                         type : King, 
                         move : 0,
                     }
@@ -182,7 +182,6 @@ class Game {
                     moves.push([row + direction, col - 1]);
                 }
              }
-
             return moves;
         }
 
@@ -354,13 +353,13 @@ class Game {
         }
 
         isUnderAttack (row, col, color){
-            let piece = this.Board[row][col];
+            let attackingPiece = this.Board[row][col];
             for (let i = 0; i< 8 ; i++){
                 for (let j = 0; j< 8; j++){
-                    if(piece.type != Empty && piece.color != color){
-                        let moves = this.getMove(row, col);     
-                        let index = moves.find(row,col);
-                        if (index!=null){
+                    if(this.Board[i][j].type !== Empty && this.Board[i][j].color !== color){
+                        let moves = this.getMove(i, j);     
+                        let index = moves.find(coords => coords[0] === row && coords[1] === col);
+                        if (index!==-1){
                             return true;
                         }
                     }
@@ -385,8 +384,8 @@ class Game {
             let moves = this.getMove(startRow,startCol);
             let color = this.Board[startRow][startCol].color;
 
-                let index = moves.find(endRow,endCol); 
-                    if (index != null) {
+                let index = moves.find(coords => coords[0] === endRow && coords[1] === endCol);
+                    if (index) {
                          if(piece == King && this.King.move == 0 && (endCol === 2 || endCol === 7)){ //castling 
                             let squareInformation;
                             if(endCol ===2){
@@ -433,6 +432,7 @@ class Game {
                                 this.Board[startRow][5] = squareInformation;
                             }
                             this.lastMoveDouble = false;
+                            return true;
                             }
                         else if (this.lastMoveDouble && //en passant 
                                  piece == Pawn && 
@@ -454,6 +454,7 @@ class Game {
                                     }
                                     this.Board[endRow][endCol] = squareInformation;
                                  }
+                                 return true;
 
                         }
                         else if (piece == King || piece == Rook || (piece == Pawn && endRow == startRow+2)){
@@ -475,7 +476,9 @@ class Game {
                                 else {
                                     this.lastMoveDouble = false;
                                 }
+                                return true;
                             }
+                            
                         }
                         else {
                             let squareInformation = {
@@ -489,9 +492,11 @@ class Game {
                                 type : piece,
                                 move : 0,
                             }
-                            this.Board[endRow][endRow] = squareInformation;  
+                            this.Board[endRow][endCol] = squareInformation;  
                             this.lastMoveDouble = false;
+                            return true;
                         }
+                        return false;
                     }
 
         getMove(row,col){
@@ -580,32 +585,4 @@ class Game {
             return !this.escapeMoves(color);
         }
     }
-
-    let game = new Game();
-        let chessboard = document.querySelector('.chessboard');
-
-        let virtStat = document.getElementById() // finish 
-        let virtBoard = 
-        for (let row = 0; row<8; row++){
-            for (let col = 0; col< 8; col++){
-                let square = document.createElement('div');
-                square.classList.add('square');
-
-                if((row+col)%2==0){
-                    square.classList.add('white');
-                    white = !white;
-                } 
-                else {
-                    square.classList.add('black');
-                    white = !white;
-                }
-
-                chessboard.appendChild(square);
-
-            }
-        
-    }
-    
-
-        
 
