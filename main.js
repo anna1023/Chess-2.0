@@ -3,11 +3,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const game = new Game();
     const board = game.Board; 
-    for(let x =0; x<8 ; x++){
-        for (let y =0; y<8; y++){
-            console.log("square",x,"row",y,board[x][y].type,board[x][y].color);
-        }
-    }
+    //for(let x =0; x<8 ; x++){
+       // for (let y =0; y<8; y++){
+            //console.log("square",x,"row",y,board[x][y].type,board[x][y].color);
+        //}
+    //}
 
     for (let row = 0; row < 8; row++) {
         const rowElement = document.createElement('tr');
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     chessboard.addEventListener('dragstart', (event) => {
         const pieceDiv = event.target;
+        console.log(pieceDiv.classList);
         if (pieceDiv.classList.contains('piece')) {
             event.dataTransfer.setData('text/plain', ''); 
             pieceDiv.classList.add('dragging');
@@ -55,10 +56,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const draggedPiece = document.querySelector('.dragging');
         if (!draggedPiece) return;
 
-        const sourceRow = parseInt(draggedPiece.getAttribute('data-row'));
-        const sourceCol = parseInt(draggedPiece.getAttribute('data-col'));
-        const targetRow = parseInt(targetCell.parentElement.getAttribute('data-row'));
-        const targetCol = parseInt(targetCell.getAttribute('data-col'));
+        console.log(draggedPiece);
+        console.log(targetCell);
+
+        let sourceRow = parseInt(draggedPiece.getAttribute('data-row'));
+        console.log(sourceRow);
+        let sourceCol = parseInt(draggedPiece.getAttribute('data-col'));
+        let targetRow = parseInt(targetCell.parentElement.getAttribute('data-row'));
+        let targetCol = parseInt(targetCell.getAttribute('data-col'));
+
 
         if (game.makeMove(sourceRow, sourceCol, targetRow, targetCol)){ //bug
             targetCell.appendChild(draggedPiece);
@@ -67,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
         else{
             console.log('Invalid Move');
         }
-        draggedPiece.classList.remove('dragging');
+        draggedPiece.classList.remove('dragging');  
     });
 
     chessboard.addEventListener('dragenter', (event) => {
@@ -91,11 +97,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function getPieceSymbol(pieceInfo) {
     const pieceSymbols = {
-        [Pawn + White]: '♙', [Rook + White]: '♖', [Knight + White]: '♘', [Bishop + White]: '♗', [King + White]: '♔', [Queen + White]: '♕',
-        [Pawn + Black]: '♟', [Rook + Black]: '♜', [Knight + Black]: '♞', [Bishop + Black]: '♝', [King + Black]: '♚', [Queen + Black]: '♛'
+        ["1 + 1"]: '♙' ,["2 + 1"]: '♖', ["3 + 1"]: '♘', ["4 + 1"]: '♗', ["5 + 1"]: '♔', ["6 + 1"]: '♕',
+        ["1 + 2"]: '♟', ["2 + 2"]: '♜', ["3 + 2"]: '♞', ["4 + 2"]: '♝', ["5 + 2"]: '♚', ["6 + 2"]: '♛'
     };
-
-    return pieceSymbols[pieceInfo.type + pieceInfo.color];
+    let chesstype = pieceInfo.type.toString();
+    let chesscolor = pieceInfo.color.toString();
+    return pieceSymbols[chesstype.concat(" + ", chesscolor)];
 }
 
 

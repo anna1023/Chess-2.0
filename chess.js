@@ -380,9 +380,11 @@ class Game {
         }
 
 
-        makeMove (piece,startRow,startCol,endRow,endCol) { 
+        makeMove (startRow,startCol,endRow,endCol) { 
+            console.log(startRow);
             let moves = this.getMove(startRow,startCol);
             let color = this.Board[startRow][startCol].color;
+            let piece = this.Board[startRow][startCol].type;
 
                 let index = moves.find(coords => coords[0] === endRow && coords[1] === endCol);
                     if (index) {
@@ -492,6 +494,7 @@ class Game {
                                 type : piece,
                                 move : 0,
                             }
+                            console.log(this.Board); // board 
                             this.Board[endRow][endCol] = squareInformation;  
                             this.lastMoveDouble = false;
                             return true;
@@ -501,7 +504,7 @@ class Game {
 
         getMove(row,col){
             let piece = this.Board[row][col].type;
-            let moves;
+            let moves = [];
             if (piece == Pawn){
                 moves = this.generatePawnMoves(row,col,this.Board[row][col].color);
             }
