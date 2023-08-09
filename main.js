@@ -3,11 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const game = new Game();
     const board = game.Board; 
-    //for(let x =0; x<8 ; x++){
-       // for (let y =0; y<8; y++){
-            //console.log("square",x,"row",y,board[x][y].type,board[x][y].color);
-        //}
-    //}
 
     for (let row = 0; row < 8; row++) {
         const rowElement = document.createElement('tr');
@@ -27,6 +22,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 pieceDiv.setAttribute('data-col',col);
                 cellElement.appendChild(pieceDiv);
             }
+            cellElement.setAttribute('data-row', row); 
+            cellElement.setAttribute('data-col', col);
 
             rowElement.appendChild(cellElement);
         }
@@ -52,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         const targetCell = event.target.closest('.cell');
         if (!targetCell) return;
-
         const draggedPiece = document.querySelector('.dragging');
         if (!draggedPiece) return;
 
@@ -62,11 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
         let sourceRow = parseInt(draggedPiece.getAttribute('data-row'));
         console.log(sourceRow);
         let sourceCol = parseInt(draggedPiece.getAttribute('data-col'));
-        let targetRow = parseInt(targetCell.parentElement.getAttribute('data-row'));
+        let targetRow = parseInt(targetCell.getAttribute('data-row'));
         let targetCol = parseInt(targetCell.getAttribute('data-col'));
-
-
-        if (game.makeMove(sourceRow, sourceCol, targetRow, targetCol)){ //bug
+        console.log(sourceRow,sourceCol,targetRow,targetCol);
+        if (game.makeMove(sourceRow, sourceCol, targetRow, targetCol)){ 
             targetCell.appendChild(draggedPiece);
             draggedPiece.classList.remove('dragging');
         }
