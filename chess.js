@@ -214,7 +214,7 @@ class Game {
                     up = 1;
                 }
                 for (let y = col + up; this.isValidPosition(row,y); y+=up){
-                    if (this.Board[row][y] === Empty){
+                    if (this.Board[row][y].type === Empty){
                         moves.push([row,y]);
                     }
                     else {
@@ -379,8 +379,7 @@ class Game {
             }
         }
 
-
-        makeMove (startRow,startCol,endRow,endCol) { 
+        makeMove (startRow,startCol,endRow,endCol) {
             let moves = this.getMove(startRow,startCol);
             console.log(this.Board);
             console.log(moves);
@@ -388,8 +387,9 @@ class Game {
             let piece = this.Board[startRow][startCol].type;
 
                 let index = moves.find(coords => coords[0] === endRow && coords[1] === endCol);
+                console.log(index);
                     if (index) {
-                         if(piece == King && this.King.move == 0 && (endCol === 2 || endCol === 7)){ //castling 
+                         if(piece == King && this.Board[startRow][startCol].move == 0 && (endCol === 2 || endCol === 7)){ //castling 
                             console.log("here");
                             let squareInformation;
                             if(endCol ===2){
@@ -438,7 +438,7 @@ class Game {
                             this.lastMoveDouble = false;
                             return true;
                             }
-                        else if (this.lastMoveDouble && //en passant 
+                       /* else if (this.lastMoveDouble && //en passant 
                                  piece == Pawn && 
                                  this.Board[endRow][endCol].type == Empty && 
                                  (endCol == startCol+1 || endCol == startCol-1)){
@@ -461,7 +461,7 @@ class Game {
                                  }
                                  return true;
 
-                        }
+                        } */
                         else if (piece == King || piece == Rook || (piece == Pawn && endRow == startRow+2)){
                                 console.log("here");
                                 let squareInformation = {
@@ -498,8 +498,7 @@ class Game {
                                 type : piece,
                                 move : 0,
                             }
-                            console.log(this.Board); // board
-                            console.log(endRow,endCol); 
+                            console.log(this.Board);
                             this.Board[endRow][endCol] = squareInformation;  
                             this.lastMoveDouble = false;
                             return true;
@@ -514,6 +513,7 @@ class Game {
             let moves = [];
             if (piece == Pawn){
                 moves = this.generatePawnMoves(row,col,this.Board[row][col].color);
+                console.log("hi");
             }
             
             if (piece == Rook){
