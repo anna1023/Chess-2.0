@@ -14,7 +14,7 @@ class Game {
     constructor() { 
         this.Board = new Array(8).fill().map((_, row) => new Array(8).fill(0));
         this.Turn = White;
-        this.lastMoveDouble = false;
+        this.lastMoveDouble = false;       
     for (let row=0; row<8 ; row++){
         for (let col=0; col<8; col++){
             if (row==1){
@@ -343,6 +343,7 @@ class Game {
         }
 
         isSquareUnderAttack (color, row, startCol, endCol){
+            console.log("isSquareUnderAttack being called");
             let oppColor = color === White ? Black : White;
             for (let col = startCol; col <= endCol ; col ++){
                 if(!this.isUnderAttack(row, col, oppColor)) {
@@ -353,11 +354,19 @@ class Game {
         }
 
         isUnderAttack (row, col, color){
-            let attackingPiece = this.Board[row][col];
+            console.log("isUnderAttack being called");
             for (let i = 0; i< 8 ; i++){
                 for (let j = 0; j< 8; j++){
+                    console.log(i,j);
+                    console.log(color);
+                    console.log(this.Board[i][j].type);
+                    console.log(this.Board[i][j].color);
+                    console.log(this.Board[i][j].type !== Empty);
+                    console.log(this.Board[i][j].color !== color);
                     if(this.Board[i][j].type !== Empty && this.Board[i][j].color !== color){
-                        let moves = this.getMove(i, j);     
+                        console.log("made it inside isUnder Attack");
+                        let moves = this.getMove(i, j);   
+                        console.log(moves);  
                         let index = moves.find(coords => coords[0] === row && coords[1] === col);
                         if (index!==-1){
                             return true;
@@ -369,6 +378,7 @@ class Game {
         }
 
         findKingPosition (color) {
+            console.log("find KingPosition");
             for (let i = 0; i< 8; i++){
                 for (let j = 0; j< 8 ; j++){
                     let piece = this.Board[i][j];
@@ -509,6 +519,7 @@ class Game {
                 }
 
         getMove(row,col){
+            console.log("hi");
             let piece = this.Board[row][col].type;
             let moves = [];
             if (piece == Pawn){
@@ -535,6 +546,7 @@ class Game {
             if (piece == King){
                 moves = this.generateKingMoves(row,col);
             }
+            console.log("bye");
             return moves;
 
         }
@@ -574,9 +586,10 @@ class Game {
         }
 
         isCheck (color) { //remember illegal moves 
-            let kingPoistion = this.findKingPosition(color);
+            let kingPosition = this.findKingPosition(color);
             let oppColor = color === White ? Black : White;
-            return this.isUnderAttack(kingPoistion.x , kingPoistion.y , oppColor);
+            console.log(color);
+            return this.isUnderAttack(kingPosition.i , kingPosition.j , color);
         }
         
         isCheckmate (color) {
@@ -594,5 +607,6 @@ class Game {
 
             return !this.escapeMoves(color);
         }
+
     }
 

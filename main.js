@@ -63,8 +63,19 @@ document.addEventListener('DOMContentLoaded', function () {
         let targetCol = parseInt(targetCell.getAttribute('data-col'));
         if (game.makeMove(sourceRow, sourceCol, targetRow, targetCol)){ 
             targetCell.appendChild(draggedPiece);
+            draggedPiece.setAttribute('data-row',targetRow);
+            draggedPiece.setAttribute('data-col', targetCol);
             draggedPiece.classList.remove('dragging');
-            console.log("made it");
+            let color;
+            if (draggedPiece.classList[1] === "White"){
+                color = 1;
+            }
+            else {
+                color = 2;
+            }
+            if(game.isCheck(color) && game.isCheckmate(color) && game.isStalemate(color)){
+                this.Turn = White? Black : White;
+            }
         }
         else{
             console.log('Invalid Move');
