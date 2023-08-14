@@ -164,7 +164,7 @@ class Game {
         let generateCaptureMoves = (captureRow, captureCol) => {
             if (this.isValidPosition(captureRow, captureCol) &&
                 this.Board[captureRow] [captureCol].type !== Empty &&
-                this.Board[captureRow] [captureCol].color === !color){
+                this.Board[captureRow] [captureCol].color !== color){
                     moves.push([captureRow, captureCol]);
                 }
         }
@@ -196,7 +196,7 @@ class Game {
                     right = 1;
                 }
                 for (let x = row + right; this.isValidPosition(x,col); x+=right){  
-                    if(this.Board[x][col].type === Empty){
+                    if(this.Board[x][col].type === Empty || this.Board[x][col].color !== this.Board[row][col].color){
                         moves.push([x,col]);
                     }
                     else {
@@ -214,7 +214,7 @@ class Game {
                     up = 1;
                 }
                 for (let y = col + up; this.isValidPosition(row,y); y+=up){
-                    if (this.Board[row][y].type === Empty){
+                    if (this.Board[row][y].type === Empty || this.Board[row][y].color !== this.Board[row][col].color){
                         moves.push([row,y]);
                     }
                     else {
@@ -266,7 +266,7 @@ class Game {
                 let y = col + direction2;
 
                 while(this.isValidPosition(x,y)){
-                    if (this.Board[x][y].type === Empty || this.Board[x][y].color != this.Board[x][y].color) {
+                    if (this.Board[x][y].type === Empty || this.Board[x][y].color != this.Board[row][col].color) {
                         moves.push([x,y]);
                         x += direction1;
                         y += direction2;
@@ -318,14 +318,16 @@ class Game {
             if (this.Board[row][col].move == 0){
                 if(this.Board[row][0].move == 0 && 
                    this.Board[row][0].type == Rook && 
-                   this.isSquareEmpty(row, 1, 3) && 
-                   !this.isSquareUnderAttack(this.Board[row][col].color, row, 1, 3)) {
+                   this.isSquareEmpty(row, 1, 3) 
+                   //!this.isSquareUnderAttack(this.Board[row][col].color, row, 1, 3)
+                   ) {
                     moves.push([row,2]);
                 }
                 if (this.Board[row][7].move == 0 &&
                     this.Board[row][7].type == Rook && 
-                    this.isSquareEmpty(row, 5, 7) && 
-                    !this.isSquareUnderAttack(this.Board[row][col].color, row, 5, 7) ){
+                    this.isSquareEmpty(row, 5, 7) 
+                    //!this.isSquareUnderAttack(this.Board[row][col].color, row, 5, 7)
+                     ){
                     moves.push([row,6]);
                 }
             }  
@@ -343,32 +345,26 @@ class Game {
         }
 
         isSquareUnderAttack (color, row, startCol, endCol){
-            console.log("isSquareUnderAttack being called");
             let oppColor = color === White ? Black : White;
             for (let col = startCol; col <= endCol ; col ++){
-                if(!this.isUnderAttack(row, col, oppColor)) {
+                console.log(!this.isUnderAttack(row, col, color));
+                if(!this.isUnderAttack(row, col, color)) {
                     return false;
                 }
             }
             return true;
         }
 
-        isUnderAttack (row, col, color){
-            console.log("isUnderAttack being called");
+        isUnderAttack (row, col, color){ 
+            console.log(row,col);
             for (let i = 0; i< 8 ; i++){
                 for (let j = 0; j< 8; j++){
-                    console.log(i,j);
-                    console.log(color);
-                    console.log(this.Board[i][j].type);
-                    console.log(this.Board[i][j].color);
-                    console.log(this.Board[i][j].type !== Empty);
-                    console.log(this.Board[i][j].color !== color);
-                    if(this.Board[i][j].type !== Empty && this.Board[i][j].color !== color){
-                        console.log("made it inside isUnder Attack");
+                    if(this.Board[i][j].type !== Empty && this.Board[i][j].color == color){
                         let moves = this.getMove(i, j);   
-                        console.log(moves);  
+                        //console.log(this.Board[i][j].type,this.Board[i][j].color,moves);
                         let index = moves.find(coords => coords[0] === row && coords[1] === col);
-                        if (index!==-1){
+                        if (index !== undefined){
+                            console.log("check");
                             return true;
                         }
                     }
@@ -377,13 +373,17 @@ class Game {
             return false;
         }
 
-        findKingPosition (color) {
-            console.log("find KingPosition");
+        findKingPosition (color) { 
             for (let i = 0; i< 8; i++){
                 for (let j = 0; j< 8 ; j++){
+                    console.log(i);
+                    console.log(j);
                     let piece = this.Board[i][j];
+                    console.log("printing Piece in Find King");
+                    console.log(piece);
                     if(piece.type == King && piece.color == color){
-                        return {i,j}
+                        console.log(i,j);
+                        return {i,j};
                     }
                 }
             }
@@ -395,12 +395,15 @@ class Game {
             console.log(moves);
             let color = this.Board[startRow][startCol].color;
             let piece = this.Board[startRow][startCol].type;
-
+            if(color !== this.Turn){
+                console.log("not your turn, it's ",color,this.Turn);
+                return false;
+            }
                 let index = moves.find(coords => coords[0] === endRow && coords[1] === endCol);
                 console.log(index);
                     if (index) {
-                         if(piece == King && this.Board[startRow][startCol].move == 0 && (endCol === 2 || endCol === 7)){ //castling 
-                            console.log("here");
+                         if(piece == King && this.Board[startRow][startCol].move == 0 && (endCol === 2 || endCol === 6)){ //castling 
+                            console.log("here ur ");
                             let squareInformation;
                             if(endCol ===2){
                                 squareInformation = {
@@ -424,7 +427,7 @@ class Game {
                                 this.Board[startRow][3] = squareInformation;
                             }
 
-                            if(endCol === 7){
+                            if(endCol === 6){
                                 squareInformation = {
                                     color : null,
                                     type : Empty,
@@ -446,6 +449,7 @@ class Game {
                                 this.Board[startRow][5] = squareInformation;
                             }
                             this.lastMoveDouble = false;
+                            console.log(this.Board);
                             return true;
                             }
                        /* else if (this.lastMoveDouble && //en passant 
@@ -492,8 +496,26 @@ class Game {
                                 else {
                                     this.lastMoveDouble = false;
                                 }
+                                console.log(this.Board);
                                 return true;
                             }
+
+                        else if(piece == Pawn && (endRow == 0 || endRow == 7)){
+                                let squareInformation = {
+                                    color : null,
+                                    type : Empty,
+                                    move : 0,
+                                }
+                                this.Board[startRow][startCol] = squareInformation;
+                                squareInformation = {
+                                    color : color,
+                                    type : Queen, 
+                                    move : 0,
+                                }
+                                this.Board[endRow][endCol] = squareInformation;
+                                this.lastMoveDouble = false;
+                                return true;
+                             } 
                             
                         else {
                             console.log("here");
@@ -508,9 +530,17 @@ class Game {
                                 type : piece,
                                 move : 0,
                             }
-                            console.log(this.Board);
+                            console.log("checking newinfo");
+                            console.log(endRow,endCol);
+                            console.log(squareInformation);
                             this.Board[endRow][endCol] = squareInformation;  
+                            console.log(this.Board[endRow][endCol]);
                             this.lastMoveDouble = false;
+                            console.log("Board info");
+                            console.log(this.Board);
+                            console.log("BOARD HERE");
+                            console.log(this.Board[endRow][endCol]);
+                            console.log(this.Board);
                             return true;
                         }
                     }
@@ -519,12 +549,10 @@ class Game {
                 }
 
         getMove(row,col){
-            console.log("hi");
             let piece = this.Board[row][col].type;
             let moves = [];
             if (piece == Pawn){
                 moves = this.generatePawnMoves(row,col,this.Board[row][col].color);
-                console.log("hi");
             }
             
             if (piece == Rook){
@@ -546,7 +574,6 @@ class Game {
             if (piece == King){
                 moves = this.generateKingMoves(row,col);
             }
-            console.log("bye");
             return moves;
 
         }
@@ -563,7 +590,7 @@ class Game {
                             let y = coord[1];
                             let original = this.Board[x][y];
                             this.Board[x][y] = piece;
-                            let squareInformation = {
+                            let squareInformation = { // bug!!
                                 type : Empty,
                                 color : null,
                                 move : 0,
@@ -586,8 +613,11 @@ class Game {
         }
 
         isCheck (color) { //remember illegal moves 
-            let kingPosition = this.findKingPosition(color);
             let oppColor = color === White ? Black : White;
+            let kingPosition = this.findKingPosition(oppColor);
+            console.log(this.findKingPosition(oppColor));
+            console.log(kingPosition.i);
+            console.log(kingPosition.j);
             console.log(color);
             return this.isUnderAttack(kingPosition.i , kingPosition.j , color);
         }
@@ -596,7 +626,6 @@ class Game {
             if(!this.isCheck(color)) {
                 return false;
             }
-
             return !this.escapeMoves(color);
         }
 
@@ -606,6 +635,16 @@ class Game {
             }
 
             return !this.escapeMoves(color);
+        }
+
+        quickCheck(){
+            let currentTurn = this.Turn;
+                if (this.isCheckmate(currentTurn)) {
+                    console.log(`${this.Turn} is in checkmate. Game over!`);
+                } else if (this.isStalemate(currentTurn)) {
+                    console.log(`Stalemate! Game is a draw.`);
+                }
+                this.Turn = this.Turn === White ? Black : White;
         }
 
     }
