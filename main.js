@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const game = new Game();
     const board = game.Board; 
+    let gameStatusElement = document.getElementById('game-status');
+
+    function displayGameOverMessage(message) {
+        gameStatusElement.textContent = message;
+    }
 
     for (let row = 0; row < 8; row++) {
         const rowElement = document.createElement('tr');
@@ -55,14 +60,82 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!draggedPiece) return;
 
         console.log(draggedPiece);
-        console.log(targetCell);
 
         let sourceRow = parseInt(draggedPiece.getAttribute('data-row'));
         let sourceCol = parseInt(draggedPiece.getAttribute('data-col'));
         let targetRow = parseInt(targetCell.getAttribute('data-row'));
         let targetCol = parseInt(targetCell.getAttribute('data-col'));
+        let Rookwhite = {
+            color: White,
+            type : Rook, 
+            move : 1,
+        }
+        let RookBlack = {
+            color: Black,
+            type : Rook,
+            move : 1,
+        }
+        let Queenwhite = {
+            color : White,
+            type : Queen,
+            move : 0,
+        }
+        let QueenBlack = {
+            color : Black, 
+            type : Queen,
+            move : 0,
+        }
+        console.log(targetCell.classList);
         if (game.makeMove(sourceRow, sourceCol, targetRow, targetCol)){ 
+            if(targetCell.querySelector('.piece')){
+                removePiece(targetRow,targetCol);
+            }
+            let piece = game.Board[targetRow][targetCol];
             targetCell.appendChild(draggedPiece);
+        if (piece.type === King && Math.abs(targetCol - sourceCol) === 2) {
+            // Castling
+            if (piece.color == White){
+                if (targetCol === 2) {
+                    // Queenside castling
+                    game.Board[targetRow][3] = Rookwhite;
+                    updateCell(targetRow, 3, Rookwhite);
+                    updateCell(targetRow, 0, { type: Empty, color: null, move: 0 });
+                } else if (targetCol === 6) {
+                    // Kingside castling
+                    game.Board[targetRow][5] = Rookwhite;
+                    updateCell(targetRow, 5, Rookwhite);
+                    updateCell(targetRow, 7, { type: Empty, color: null, move: 0 });
+                }
+                targetCell.appendChild(draggedPiece);
+            }
+            if (piece.color == Black){
+                if (targetCol === 2) {
+                    // Queenside castling
+                    game.Board[targetRow][3] = RookBlack;
+                    updateCell(targetRow, 3, RookBlack);
+                    updateCell(targetRow, 0, { type: Empty, color: null, move: 0 });
+                } else if (targetCol === 6) {
+                    // Kingside castling
+                    game.Board[targetRow][5] = RookBlack;
+                    updateCell(targetRow, 5, RookBlack);
+                    updateCell(targetRow, 7, { type: Empty, color: null, move: 0 });
+                }
+                targetCell.appendChild(draggedPiece);
+            }
+        }
+        if (piece.type === Queen && ((piece.color == White && targetRow == 0) || (piece.color == Black && targetRow === 7))) {
+            targetCell.appendChild(draggedPiece);
+            removePiece(targetRow,targetCol);
+            if (piece.color === White) {
+                game.Board[targetRow][targetCol] = Queenwhite;
+                updateCell(targetRow, targetCol, Queenwhite); 
+            }
+            if (piece.color === Black) {
+                game.Board[targetRow][targetCol] = QueenBlack;
+                updateCell(targetRow, targetCol, QueenBlack); 
+            } 
+        }
+            //targetCell.appendChild(draggedPiece);
             draggedPiece.setAttribute('data-row',targetRow);
             draggedPiece.setAttribute('data-col', targetCol);
             draggedPiece.classList.remove('dragging');
@@ -73,9 +146,14 @@ document.addEventListener('DOMContentLoaded', function () {
             else {
                 color = 2;
             }
-            if(game.isCheck(color) && game.isCheckmate(color) && game.isStalemate(color)){
-                this.Turn = White? Black : White;
-            }
+            console.log(game.isCheck(color),game.isCheckmate(color), game.isStalemate(color));
+            game.quickCheck();
+           // if (status === "1"){
+             //   displayGameOverMessage(`${game.Turn} is in checkmate. Game over!`);
+            //}
+            //if(status === "2"){
+              //  displayGameOverMessage(`Stalemate! Game is a draw.`);
+            //}
         }
         else{
             console.log('Invalid Move');
@@ -111,6 +189,41 @@ function getPieceSymbol(pieceInfo) {
     let chesscolor = pieceInfo.color.toString();
     return pieceSymbols[chesstype.concat(" + ", chesscolor)];
 }
+
+function removePiece(row,col){
+    let cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    if (cell){
+        let piece = cell.querySelector('.piece');
+        if(piece){
+            cell.removeChild(piece);
+        }
+    }
+}
+
+function updateCell(row, col, pieceInfo) {
+    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+    if (pieceInfo.type !== Empty) {
+        //cell.textContent = getPieceSymbol(pieceInfo);
+        const pieceElement = createPieceElement(row,col,pieceInfo);
+        cell.appendChild(pieceElement);
+    } else {
+        cell.textContent = ''; 
+    }
+}
+
+function createPieceElement(row,col,pieceInfo) {
+    const pieceElement = document.createElement('div');
+    pieceElement.classList.add('piece', pieceInfo.color === White ? 'White' : 'Black');
+    pieceElement.setAttribute('data-type', pieceInfo.type);
+    pieceElement.setAttribute('data-row', row); 
+    pieceElement.setAttribute('data-col', col);
+    pieceElement.draggable = true; 
+    pieceElement.innerHTML = getPieceSymbol(pieceInfo);
+    return pieceElement;
+}
+
+
+
 
 
 
